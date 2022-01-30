@@ -15,60 +15,74 @@ function App(){
     { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
     { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
   ])
-  const [filter, setFilter]=useState('')
-  const addContact = ({ name, number, id }) => {
-    const contact = {
-      id,
-      name,
-      number,
-    };
+  const [filter, setFilter]=useState('');
 
-    this.setState(prevState => ({
-      contacts: [contact, ...prevState.contacts],
-    }));
-  };
+  useEffect(() => {
+    const storageContacts = localStorage.getItem(LS_KEY);
+    const parsedStorageContacts = JSON.parse(storageContacts);
 
-  onDeleteHandler = id => {
-    const filtredContacts = this.state.contacts.filter(
-      contact => contact.id !== id
-    );
-    this.setState(prevState => {
-      return { ...prevState, contacts: [...filtredContacts] };
+    if (parsedStorageContacts) {
+      setContacts([...parsedStorageContacts]);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(LS_KEY, JSON.stringify(contacts));
+  }, [contacts]);
+
+
+  const addContact = contactObj => {
+    setContacts(prevState => {
+      return [contactObj, ...prevState];
     });
   };
 
-  onChangeHandler = filter => {
-    this.setState(prevState => {
-      return { ...prevState, filter: filter };
-    });
+  const onDeleteHandler = id => {
+    const filtredContacts = contacts.filter(contact => contact.id !== id);
+    setContacts([...filtredContacts]);
   };
 
-  onFilterContacts = () => {
+  const onChangeHandler = filter => {
+    setFilter(filter);
+  };
+
+  
+
+  const onFilterContacts = () => {
     let filterContact = [];
-    if (this.state.filter) {
-      filterContact = this.state.contacts.filter(
-        contact => contact.name.toLowerCase().includes(this.state.filter)
+    if (filter) {
+      filterContact = contacts.filter(
+        contact => contact.name.toLowerCase().includes(filter)
       );
     } else {
-      return this.state.contacts;
+      return contacts;
     }
     return filterContact;
   };
 
-  componentDidMount() {
-    const savedStateContacts = localStorage.getItem(LS_KEY);
-
-    if (savedStateContacts) {
-      this.setState({ contacts: JSON.parse(savedStateContacts) });
-    }
-  }
-
-  componentDidUpdate(_, prevState) {
-    if (prevState.contacts !== this.state.contacts) {
-      localStorage.setItem(LS_KEY, JSON.stringify(this.state.contacts));
-    }
-  }
-
+  
+ 
+  return (
+    <>
+      <Container>
+        <Section title="Phonebook">
+          <ContactForm onSubmit={addContact} contacts={contacts} />
+        </Section>
+        <Section title="Contacts">
+          {contacts.length > 0 && (
+            <>
+              <Filter onChange={onChangeHandler} />
+              <ContactList
+                filterContacts={onFilterContacts}
+                onDelete={onDeleteHandler}
+              />
+            </>
+          )}
+        </Section>
+      </Container>
+      <GlobalStyle />
+    </>
+  );
 }
 
 // class App extends Component {
@@ -137,27 +151,27 @@ function App(){
 
 //   render() {
 //     const { contacts } = this.state;
-//     return (
-//       <>
-//         <Container>
-//           <Section title="Phonebook">
-//             <ContactForm onSubmit={this.addContact} contacts={contacts} />
-//           </Section>
-//           <Section title="Contacts">
-//             {contacts.length > 0 && (
-//               <>
-//                 <Filter onChange={this.onChangeHandler} />
-//                 <ContactList
-//                   filterContacts={this.onFilterContacts}
-//                   onDelete={this.onDeleteHandler}
-//                 />
-//               </>
-//             )}
-//           </Section>
-//         </Container>
-//         <GlobalStyle />
-//       </>
-//     );
+    // return (
+    //   <>
+    //     <Container>
+    //       <Section title="Phonebook">
+    //         <ContactForm onSubmit={this.addContact} contacts={contacts} />
+    //       </Section>
+    //       <Section title="Contacts">
+    //         {contacts.length > 0 && (
+    //           <>
+    //             <Filter onChange={this.onChangeHandler} />
+    //             <ContactList
+    //               filterContacts={this.onFilterContacts}
+    //               onDelete={this.onDeleteHandler}
+    //             />
+    //           </>
+    //         )}
+    //       </Section>
+    //     </Container>
+    //     <GlobalStyle />
+    //   </>
+    // );
 //   }
 // }
 
