@@ -1,4 +1,4 @@
-import { Component } from "react";
+
 import { FormInput } from "./ContactForm.styled";
 import propTypes from "prop-types";
 import { Formik, Field, Form } from "formik";
@@ -9,9 +9,9 @@ const initialState = {
   number: "",
 };
 
-export default class ContactForm extends Component {
-  handleSubmit = ({ name, number }, { resetForm }) => {
-    const isNameInContacts = this.props.contacts.find(
+function ContactForm ({contacts, onSubmit}) {
+ const handleSubmit = ({ name, number }, { resetForm }) => {
+    const isNameInContacts = contacts.find(
       (contact) => contact.name.toLowerCase() === name.toLowerCase()
     );
 
@@ -21,13 +21,13 @@ export default class ContactForm extends Component {
     }
 
     const contactObj = { id: nanoid(6), name, number };
-    this.props.onSubmit(contactObj);
+    onSubmit(contactObj);
     resetForm();
   };
 
-  render() {
+  
     return (
-      <Formik initialValues={initialState} onSubmit={this.handleSubmit}>
+      <Formik initialValues={initialState} onSubmit={handleSubmit}>
         <Form autoComplete="off">
           <label htmlFor="name">Name</label>
           <Field
@@ -53,8 +53,10 @@ export default class ContactForm extends Component {
         </Form>
       </Formik>
     );
-  }
+  
 }
+
+export default ContactForm
 
 ContactForm.propTypes = {
   onSubmit: propTypes.func.isRequired,
